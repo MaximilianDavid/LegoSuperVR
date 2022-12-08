@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c81dfb9456c9957409a143b341dd7826, type: 3}
+  m_Name: 1x4LegoBrick
+  m_EditorClassIdentifier: 
+  nameString: 1x4 Lego Brick
+  prefab: {fileID: 8836007296637424228, guid: 1a96dd5d533db644e99220e697832768, type: 3}
+  visual: {fileID: 4897514522808705855, guid: 4404e788a140ada4691e72f90b292aa4, type: 3}
+  ghostVisual: {fileID: 4897514522808705855, guid: 206ba2952e3283b478d1c3f85df83e1d,
+    type: 3}
+  width: 4
+  height: 1

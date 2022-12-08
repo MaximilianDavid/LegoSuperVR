@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c81dfb9456c9957409a143b341dd7826, type: 3}
+  m_Name: 2x4LegoBrick_Cyan
+  m_EditorClassIdentifier: 
+  nameString: Cyan 2x4 Lego Brick
+  prefab: {fileID: 8836007296637424228, guid: f3360d7cddbe17a439b5b67b7493f22e, type: 3}
+  visual: {fileID: 4897514522808705855, guid: 3b68e39e9ac973e46bf0698855c924af, type: 3}
+  ghostVisual: {fileID: 4897514522808705855, guid: 888ca7f991c2ee840aae4ed47476ae03,
+    type: 3}
+  width: 4
+  height: 2
