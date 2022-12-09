@@ -69,7 +69,7 @@ public class GridBuildingSystemVR : MonoBehaviour
     [SerializeField] private float brickOffset = 4.8f;
     [SerializeField] private float brickHeight = 9.6f;
     [SerializeField] private float basePlateHeight = .65f;
-    [SerializeField] private float scale = 1f;
+    [SerializeField] public float scale = 1f;
 
     [SerializeField] public float currentGlobalRotation = 0f;
 
@@ -105,6 +105,7 @@ public class GridBuildingSystemVR : MonoBehaviour
         Transform brickTransform = currentlyHeldObject;
         PlacedObject heldBrick = currentlyHeldPlacedObject;
         GameObject heldVisualBrick = heldBrick.VisualBrick;
+
 
         // Turn on Collisions again
         heldBrick.ignoreCollisions(false);
@@ -257,6 +258,7 @@ public class GridBuildingSystemVR : MonoBehaviour
     public void pickupBrick(PlacedObject placedObject)
     {
         placedObject.makePhysicsEnabled();
+        placedObject.makeKinematic();
         placedObject.pickUp();
 
         
@@ -566,7 +568,7 @@ public class GridBuildingSystemVR : MonoBehaviour
 
        if(downDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
         {
-            ResetLooseBrickPositions();
+            CleanupBricks();
         }
     }
 
@@ -1237,6 +1239,24 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
+
+
+    /*
+     *  Adds the given object ot the list of existing bricks
+     */
+    public void addToBrickList(PlacedObject brick)
+    {
+        bricks.Add(brick);
+    }
+
+
+
+
+
+
+
+
+
     /*
      *  Advances the manual by one page
      */
@@ -1287,17 +1307,41 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
     /*
-     *  Resets all bricks with no position within the grid to their
-     *  starting position
+     *  Removes all bricks that are not currently inside the grid, picked up
+     *  or spawners.
+     *  
+     *  Also resets every spawner's position.
      */
-    private void ResetLooseBrickPositions()
+    private void CleanupBricks()
     {
+        List<PlacedObject> bricksToRemove = new List<PlacedObject>();
         foreach(PlacedObject brick in bricks)
         {
-            if (!brick.IsPlacedInGrid)
+            // Destroy all bricks that are lying around
+            if (!brick.IsPlacedInGrid && !brick.isPickedUp() && !brick.neverPickedUp)
+            {
+                // Remove Brick from brick list & Destroy
+                bricksToRemove.Add(brick);
+                brick.DestroySelf();
+            }
+            else if(brick.neverPickedUp)
+            {
+                // Restore position of all spawner bricks
                 brick.RevertToStartingPosition();
+            }
+        }
+
+        foreach(PlacedObject brickToRemove in bricksToRemove)
+        {
+            bricks.Remove(brickToRemove);
         }
     }
+
+
+
+
+
+
 
 
 
@@ -1318,6 +1362,12 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
+
+
+
+
+
+
     /*
      *  Exception for illegal build positions
      */
@@ -1331,6 +1381,18 @@ public class GridBuildingSystemVR : MonoBehaviour
         public CannotBuildHereException(string message, Exception inner)
             : base(message, inner) { }
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

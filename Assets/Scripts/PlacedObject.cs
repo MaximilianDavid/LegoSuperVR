@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 
 /*
@@ -12,11 +13,18 @@ using UnityEngine;
 public class PlacedObject : MonoBehaviour
 {
     public PlacedObjectTypeSO placedObjectTypeSO;
+    public Throwable throwable;
+    //public ComplexThrowable complexThrowable;
+    public Interactable interactable;
+
     private Vector3 worldPosition;
     private Vector3 initialPosition;
     private Quaternion initialRotation;
     private Vector2Int origin;
     private PlacedObjectTypeSO.Dir dir;
+
+
+    [HideInInspector] public bool neverPickedUp = true;
 
     [SerializeField] private List<Vector2Int> occupiedGridPositions = new List<Vector2Int>();
     [SerializeField] private HashSet<PlacedObject> connectedToUpwards;
@@ -76,8 +84,17 @@ public class PlacedObject : MonoBehaviour
 
 
 
-    private void Awake()
+    public void Start()
     {
+        // Setup fields
+        throwable = GetComponent<Throwable>();
+        interactable = GetComponent<Interactable>();
+
+        // Connect Signals
+        throwable.onPickUp.AddListener(this.onPickup);
+        throwable.onPickUp.AddListener(delegate { GridBuildingSystemVR.Instance.pickupBrick(this);});
+        throwable.onDetachFromHand.AddListener(delegate { GridBuildingSystemVR.Instance.releaseBrick(); });
+
         // Setup connection Hashes
         connectedToDownwards = new HashSet<PlacedObject>();
         connectedToUpwards = new HashSet<PlacedObject>();
@@ -98,13 +115,52 @@ public class PlacedObject : MonoBehaviour
         }
 
         initialPosition = transform.position;
-        initialRotation = transform.rotation;
 
         rigidbody = GetComponent<Rigidbody>();
     }
 
 
 
+    public void onPickup()
+    {
+        makeKinematic();
+        // Duplicate Brick if removed from initial position
+        if (neverPickedUp)
+        {
+            duplicateBrick();
+            neverPickedUp = false;
+        }
+    }
+
+
+
+
+
+    /*
+     *  Detaches the object from the hand it's held by
+     */
+    public void forceDetach()
+    {
+        Debug.Log("In Force Detach");
+        transform.parent = null;
+        //transform.position = initialPosition;
+
+        Debug.Log(interactable.attachedToHand);
+    }
+
+
+
+    /*
+     *  Instantiates a copy of this brick at its initial position
+     */
+    private void duplicateBrick()
+    {
+        // Create clone
+        GameObject instance = Instantiate(gameObject, initialPosition, initialRotation);
+
+        // Register clone in Brick list
+        GridBuildingSystemVR.Instance.addToBrickList(instance.GetComponent<PlacedObject>());
+    }
 
 
 
