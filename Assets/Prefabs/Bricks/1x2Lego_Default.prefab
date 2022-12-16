@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2381780677131166347}
   m_Layer: 0
   m_Name: 1x2Lego_Default
-  m_TagString: Untagged
+  m_TagString: Brick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -173,6 +173,7 @@ MonoBehaviour:
   placedObjectTypeSO: {fileID: 11400000, guid: 50e29f25d5e3b6b40be3045061b79c1f, type: 2}
   throwable: {fileID: 0}
   interactable: {fileID: 0}
+  neverPickedUp: 1
   occupiedGridPositions: []
   gridNumber: -1
   showAnchors: 0
@@ -243,6 +244,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: 1x2LegoVisual
       objectReference: {fileID: 0}
+    - target: {fileID: 5241247883384338821, guid: 21f4503ffcfa93a47ada6a425873208f,
+        type: 3}
+      propertyPath: m_TagString
+      value: Brick
+      objectReference: {fileID: 0}
     - target: {fileID: 6671713303147027422, guid: 21f4503ffcfa93a47ada6a425873208f,
         type: 3}
       propertyPath: m_Enabled
@@ -253,6 +259,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 6ec147efeb38e514faa021d7b54b132b, type: 2}
+    - target: {fileID: 7857822984363361259, guid: 21f4503ffcfa93a47ada6a425873208f,
+        type: 3}
+      propertyPath: m_TagString
+      value: Brick
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 21f4503ffcfa93a47ada6a425873208f, type: 3}
 --- !u!4 &3139122118238710751 stripped

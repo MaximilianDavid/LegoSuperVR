@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2381780677131166347}
   m_Layer: 0
   m_Name: 1x1RoundLego_Default
-  m_TagString: Untagged
+  m_TagString: Brick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -173,6 +173,7 @@ MonoBehaviour:
   placedObjectTypeSO: {fileID: 11400000, guid: 2994d0f5ad1b93849a0f424c79b6f934, type: 2}
   throwable: {fileID: 0}
   interactable: {fileID: 0}
+  neverPickedUp: 1
   occupiedGridPositions: []
   gridNumber: -1
   showAnchors: 0
@@ -192,6 +193,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4664875840045671253, guid: 00e576180ba8de843be1c457c80d7384,
+        type: 3}
+      propertyPath: m_TagString
+      value: Brick
       objectReference: {fileID: 0}
     - target: {fileID: 4897514522808705855, guid: 00e576180ba8de843be1c457c80d7384,
         type: 3}
@@ -252,6 +258,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: 1x1RoundLegoVisual
+      objectReference: {fileID: 0}
+    - target: {fileID: 5241247883384338821, guid: 00e576180ba8de843be1c457c80d7384,
+        type: 3}
+      propertyPath: m_TagString
+      value: Brick
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 00e576180ba8de843be1c457c80d7384, type: 3}

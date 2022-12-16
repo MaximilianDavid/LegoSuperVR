@@ -117,6 +117,8 @@ public class PlacedObject : MonoBehaviour
         initialPosition = transform.position;
 
         rigidbody = GetComponent<Rigidbody>();
+
+        makeKinematic();
     }
 
 
@@ -166,7 +168,7 @@ public class PlacedObject : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!hasBaseSupport && !pickedUp && rigidbody.isKinematic)
+        if (!hasBaseSupport && !pickedUp && rigidbody.isKinematic && !neverPickedUp)
             makePhysicsEnabled();
     }
 

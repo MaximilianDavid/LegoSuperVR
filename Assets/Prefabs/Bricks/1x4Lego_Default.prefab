@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2381780677131166347}
   m_Layer: 0
   m_Name: 1x4Lego_Default
-  m_TagString: Untagged
+  m_TagString: Brick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -173,6 +173,7 @@ MonoBehaviour:
   placedObjectTypeSO: {fileID: 11400000, guid: e38826a7fc5f85f4dac173d80e39ad48, type: 2}
   throwable: {fileID: 0}
   interactable: {fileID: 0}
+  neverPickedUp: 1
   occupiedGridPositions: []
   gridNumber: -1
   showAnchors: 0
@@ -183,6 +184,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8836007296637424228}
     m_Modifications:
+    - target: {fileID: 672650721980483585, guid: 4404e788a140ada4691e72f90b292aa4,
+        type: 3}
+      propertyPath: m_TagString
+      value: Brick
+      objectReference: {fileID: 0}
     - target: {fileID: 4897514522808705855, guid: 4404e788a140ada4691e72f90b292aa4,
         type: 3}
       propertyPath: m_RootOrder
@@ -242,6 +248,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: 1x4LegoVisual
+      objectReference: {fileID: 0}
+    - target: {fileID: 5241247883384338821, guid: 4404e788a140ada4691e72f90b292aa4,
+        type: 3}
+      propertyPath: m_TagString
+      value: Brick
       objectReference: {fileID: 0}
     - target: {fileID: 8045860591112034119, guid: 4404e788a140ada4691e72f90b292aa4,
         type: 3}

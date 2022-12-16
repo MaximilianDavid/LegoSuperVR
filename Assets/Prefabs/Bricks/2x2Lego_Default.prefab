@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2381780677131166347}
   m_Layer: 0
   m_Name: 2x2Lego_Default
-  m_TagString: Untagged
+  m_TagString: Brick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -173,6 +173,7 @@ MonoBehaviour:
   placedObjectTypeSO: {fileID: 11400000, guid: b843612fcf423114787f8303fc90f274, type: 2}
   throwable: {fileID: 0}
   interactable: {fileID: 0}
+  neverPickedUp: 1
   occupiedGridPositions: []
   gridNumber: -1
   showAnchors: 0
@@ -243,10 +244,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4958949463883337730, guid: 705264083ac12c84186129568969529a,
+        type: 3}
+      propertyPath: m_TagString
+      value: Brick
+      objectReference: {fileID: 0}
     - target: {fileID: 5241247883384338821, guid: 705264083ac12c84186129568969529a,
         type: 3}
       propertyPath: m_Name
       value: Orange2x2LegoVisual
+      objectReference: {fileID: 0}
+    - target: {fileID: 5241247883384338821, guid: 705264083ac12c84186129568969529a,
+        type: 3}
+      propertyPath: m_TagString
+      value: Brick
       objectReference: {fileID: 0}
     - target: {fileID: 6256115548270260105, guid: 705264083ac12c84186129568969529a,
         type: 3}

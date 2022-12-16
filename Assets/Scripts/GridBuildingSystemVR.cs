@@ -34,6 +34,8 @@ public class GridBuildingSystemVR : MonoBehaviour
     [SerializeField] private List<Material> buildManualPages;
     [SerializeField] private CircularDrive circularDrive;
 
+    public PaintBrush paintBrush;
+
 
     private int currentBuildManualPage = 0;
 
@@ -568,7 +570,9 @@ public class GridBuildingSystemVR : MonoBehaviour
 
        if(downDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
         {
+            // Cleanup Scene
             CleanupBricks();
+            paintBrush.revertPosition();
         }
     }
 

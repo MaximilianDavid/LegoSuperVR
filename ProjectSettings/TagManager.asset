@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Interactable
   - GridBuildingSystem
+  - Bucket
+  - Brush
+  - Brick
   layers:
   - Default
   - TransparentFX

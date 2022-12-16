@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 375833467310014473}
   m_Layer: 0
   m_Name: 2x4LegoVisual
-  m_TagString: Untagged
+  m_TagString: Brick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -439,7 +439,7 @@ GameObject:
   - component: {fileID: 2381780677131166347}
   m_Layer: 0
   m_Name: 2x4Lego_Default
-  m_TagString: Untagged
+  m_TagString: Brick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -597,6 +597,7 @@ MonoBehaviour:
   placedObjectTypeSO: {fileID: 11400000, guid: d26aadba9ebf2d144b3e5744c23d8789, type: 2}
   throwable: {fileID: 0}
   interactable: {fileID: 0}
+  neverPickedUp: 1
   occupiedGridPositions: []
   gridNumber: -1
   showAnchors: 0
@@ -614,7 +615,7 @@ GameObject:
   - component: {fileID: 5931812763664357503}
   m_Layer: 0
   m_Name: Brick
-  m_TagString: Untagged
+  m_TagString: Brick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
