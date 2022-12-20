@@ -40,7 +40,7 @@ public class GridBuildingSystemVR : MonoBehaviour
     [SerializeField] private Transform leftControllerTransform;
     [SerializeField] private Transform rightControllerTransform;
     [SerializeField] private Renderer buildManualScreen;
-    [SerializeField] private List<Material> buildManualPages;
+    public List<InstructionPage> buildManualPages;
     [SerializeField] private CircularDrive circularDrive;
 
     public PaintBrush paintBrush;
@@ -346,10 +346,7 @@ public class GridBuildingSystemVR : MonoBehaviour
         grids = new List<GridXZ<GridObject>>();
 
 
-        // Set materials for manual screen
-        Material[] screenMats = buildManualScreen.materials;
-        screenMats[1] = buildManualPages[0];
-        buildManualScreen.materials = screenMats;
+        loadInstructionPages();
 
 
         bool showDebug = true;
@@ -1332,6 +1329,19 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
+    
+
+
+    /*
+     *  Loads the manual pages from Resources
+     */
+    private void loadInstructionPages()
+    {
+        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen0"));
+        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen1"));
+    }
+
+
 
 
 
@@ -1349,11 +1359,17 @@ public class GridBuildingSystemVR : MonoBehaviour
         }
         else
         {
-            // Show next page
+            // Advance Page
             currentBuildManualPage++;
+            
+            CleanupBricks();
+
+            // Change build manual material
             Material[] screenMats = buildManualScreen.materials;
-            screenMats[1] = buildManualPages[currentBuildManualPage];
+            screenMats[1] = buildManualPages[currentBuildManualPage].screenMaterial;
             buildManualScreen.materials = screenMats;
+
+            SpawnBricksForInstructionPage(buildManualPages[currentBuildManualPage]);
         }
     }
 
@@ -1373,11 +1389,18 @@ public class GridBuildingSystemVR : MonoBehaviour
         }
         else
         {
-            // Show previous page
+            // Reduce Page number
             currentBuildManualPage--;
+
+            CleanupBricks();
+
+            // Change screen material
             Material[] screenMats = buildManualScreen.materials;
-            screenMats[1] = buildManualPages[currentBuildManualPage];
+            screenMats[1] = buildManualPages[currentBuildManualPage].screenMaterial;
             buildManualScreen.materials = screenMats;
+
+
+            SpawnBricksForInstructionPage(buildManualPages[currentBuildManualPage]);
         }
     }
 
@@ -1415,6 +1438,73 @@ public class GridBuildingSystemVR : MonoBehaviour
             bricks.Remove(brickToRemove);
         }
     }
+
+
+
+
+
+
+
+
+
+
+    /*
+     *  Spawns all bricks for the given InstructionPage next to the build plate
+     */
+    public void SpawnBricksForInstructionPage(InstructionPage page)
+    {
+        // Set spawn position for first brick
+        Vector3 spawnPosition = plateOrigin;
+        spawnPosition += new Vector3(0, 0, (gridWidth + 1) * cellSize);
+
+
+        int numSpawned = 0;
+        int longestBrickLength = 0;
+        foreach(PlacedObject brick in page.bricks)
+        {
+            // Instantiate brick
+            GameObject spawnedBrick = Instantiate(brick.gameObject, spawnPosition, Quaternion.identity);
+            spawnedBrick.transform.localScale = new Vector3(scale, scale, scale);
+            PlacedObject spawnedPlacedObject = spawnedBrick.GetComponent<PlacedObject>();
+
+            // Change material
+            spawnedPlacedObject.changeBrickMaterial(page.brickMaterials[numSpawned]);
+            numSpawned++;
+
+            // Register brick for deletion upn cleanup
+            spawnedPlacedObject.neverPickedUp = false;
+
+            // Register brick within system
+            addToBrickList(spawnedPlacedObject);
+
+            // Check if new brick is longer than longest brick yet
+            if (longestBrickLength < spawnedPlacedObject.placedObjectTypeSO.width)
+                longestBrickLength = spawnedPlacedObject.placedObjectTypeSO.width;
+
+            // Advance Spawn position
+            if(numSpawned % 3 != 2) // 3 bricks in a column
+            {
+                // Shift in x direction
+                spawnPosition += new Vector3(cellSize, 0, 0); // Space between bricks
+                spawnPosition += new Vector3(cellSize * spawnedPlacedObject.placedObjectTypeSO.height, 0, 0);
+            }
+            else
+            {
+                // Reset x position down to plate base line
+                spawnPosition.x = plateOrigin.x;
+
+                // Shift in z direction by size of longest brick
+                spawnPosition.z += cellSize;
+                spawnPosition.z += cellSize * longestBrickLength;
+
+                // Reset longest brick
+                longestBrickLength = 0;
+            }
+        }
+    }
+
+
+
 
 
 

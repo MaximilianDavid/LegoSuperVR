@@ -24,7 +24,8 @@ public class PlacedObject : MonoBehaviour
     private PlacedObjectTypeSO.Dir dir;
 
 
-    [HideInInspector] public bool neverPickedUp = true;
+    public bool neverPickedUp = true;
+    
 
     [SerializeField] private List<Vector2Int> occupiedGridPositions = new List<Vector2Int>();
     [SerializeField] private HashSet<PlacedObject> connectedToUpwards;
@@ -32,6 +33,8 @@ public class PlacedObject : MonoBehaviour
     [SerializeField] private int gridNumber = -1;
 
     [SerializeField] private bool showAnchors = false;
+
+    private MeshRenderer meshRenderer;
 
     private bool pickedUp = false;
     private bool isPlacedInGrid = false;
@@ -89,6 +92,8 @@ public class PlacedObject : MonoBehaviour
         // Setup fields
         throwable = GetComponent<Throwable>();
         interactable = GetComponent<Interactable>();
+        if (!meshRenderer)
+            meshRenderer = gameObject.GetComponentInChildren<MeshRenderer>();
 
         // Connect Signals
         throwable.onPickUp.AddListener(this.onPickup);
@@ -284,6 +289,24 @@ public class PlacedObject : MonoBehaviour
 
         return anchor;
     }
+
+
+
+
+
+    /*
+     *  Changes the brick's material to the given one
+     */
+    public void changeBrickMaterial(Material material)
+    {
+        // Get initiate mehsRenderer if not yet done
+        if (!meshRenderer)
+            meshRenderer = gameObject.GetComponentInChildren<MeshRenderer>();
+
+        meshRenderer.material = material;
+    }
+
+
 
 
 
