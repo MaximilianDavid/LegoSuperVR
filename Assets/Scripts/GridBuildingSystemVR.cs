@@ -19,6 +19,13 @@ public class GridBuildingSystemVR : MonoBehaviour
     public SteamVR_Action_Boolean rightDirectionAction;
     public SteamVR_Action_Boolean downDirectionAction;
 
+    public GameObject playerGameObject;
+    [HideInInspector] public bool playerShrunk = false;
+    private Vector3 initialPlayerPosition;
+    private Quaternion initialPlayerRotation;
+
+
+    public List<ShrinkingPlayerHandler> shrinkingPlayerHandlers;
 
     [SerializeField] private float maximumAngleCorrection;
     [SerializeField] private Ghost ghost;
@@ -26,8 +33,10 @@ public class GridBuildingSystemVR : MonoBehaviour
     [SerializeField] private List<PlacedObjectTypeSO> placedObjectTypeSOList;
     [SerializeField] private List<PlacedObjectTypeSO> placedObjectTypeSOVGhosts;
     [SerializeField] private Material deleteGhostMaterial;
-    [SerializeField] private Material previewGhostMaterial;
+    [SerializeField] public Material previewGhostMaterial;
     [SerializeField] private Transform parentTransform;
+    public GameObject leftHand;
+    public GameObject rightHand;
     [SerializeField] private Transform leftControllerTransform;
     [SerializeField] private Transform rightControllerTransform;
     [SerializeField] private Renderer buildManualScreen;
@@ -324,6 +333,10 @@ public class GridBuildingSystemVR : MonoBehaviour
         this.maximumSnapDistance = brickHeight * 1.5f;
 
 
+        initialPlayerPosition = playerGameObject.transform.position;
+        initialPlayerRotation = playerGameObject.transform.rotation;
+
+
         plateCenter = new Vector3(
             plateOrigin.x + (80 * scale),
             plateOrigin.y,
@@ -570,10 +583,23 @@ public class GridBuildingSystemVR : MonoBehaviour
 
        if(downDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
         {
-            // Cleanup Scene
-            CleanupBricks();
-            paintBrush.revertPosition();
+            // Check if player is shrunk
+            if (playerShrunk)
+            {
+                unshrinkPlayer();
+                enableHands();
+            }
+            else
+            {
+                // Cleanup Scene
+                CleanupBricks();
+                cleanupShrinkingPlayerHandlers();
+                paintBrush.revertPosition();
+            }
         }
+
+
+       
     }
 
 
@@ -1256,6 +1282,55 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
+    /*
+     *  Returns player to his original scale and position
+     */
+    public void unshrinkPlayer()
+    {
+        playerGameObject.transform.localScale = Vector3.one;
+        playerGameObject.transform.position = initialPlayerPosition;
+        playerGameObject.transform.rotation = initialPlayerRotation;
+
+        setPlayerShrunk(false);
+    }
+
+
+
+
+
+
+
+    /*
+     *  Disables the hands
+     */
+    public void disableHands()
+    {
+        if (leftHand)
+            leftHand.SetActive(false);
+
+        if (rightHand)
+            rightHand.SetActive(false);
+    }
+
+
+
+
+
+    /*
+     *  Enables the hands
+     */
+    public void enableHands()
+    {
+        if (leftHand)
+            leftHand.SetActive(true);
+
+        if (rightHand)
+            rightHand.SetActive(true);
+    }
+
+
+
+
 
 
 
@@ -1343,6 +1418,34 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
+
+
+
+    /*
+     *  Returns all ShrinkingPlayerHandlers to their initial position
+     */
+    public void cleanupShrinkingPlayerHandlers()
+    {
+        foreach(ShrinkingPlayerHandler handler in shrinkingPlayerHandlers)
+        {
+            handler.resetPosition();
+        }
+    }
+
+
+
+
+
+
+
+
+    /*
+     *  Sets the playerShrunk field to the given Value
+     */
+    public void setPlayerShrunk(bool shrunk = true)
+    {
+        playerShrunk = shrunk;
+    }
 
 
 
