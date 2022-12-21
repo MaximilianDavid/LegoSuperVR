@@ -5,7 +5,7 @@
       "app_key": "application.generated.unity.vrbuilding.exe",
       "launch_type": "url",
       "url": "steam://launch/",
-      "action_manifest_path": "F:\\Eigene Dokumente\\Unity Projects\\Vr Building\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "action_manifest_path": "E:\\Master Thesis\\VRLegoSuperpowers\\Assets\\StreamingAssets\\SteamVR\\actions.json",
       "strings": {
         "en_us": {
           "name": "Vr Building [Testing]"

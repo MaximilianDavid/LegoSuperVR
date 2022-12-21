@@ -10879,6 +10879,11 @@ PrefabInstance:
       objectReference: {fileID: 1165553733}
     - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
         type: 3}
+      propertyPath: controleCooldown
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
+        type: 3}
       propertyPath: playerGameObject
       value: 
       objectReference: {fileID: 928188373}
@@ -11299,6 +11304,16 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 9c0e960afdc79b44993b772f166fb839, type: 2}
     - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
         type: 3}
+      propertyPath: downDirectionAction.actionPath
+      value: /actions/default/in/TrackPadDown
+      objectReference: {fileID: 0}
+    - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
+        type: 3}
+      propertyPath: leftDirectionAction.actionPath
+      value: /actions/default/in/TrackPadLeft
+      objectReference: {fileID: 0}
+    - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
+        type: 3}
       propertyPath: buildManualPages.Array.data[10]
       value: 
       objectReference: {fileID: 2100000, guid: adcc83dce9370b54c8f015a460810e1d, type: 2}
@@ -11632,6 +11647,11 @@ PrefabInstance:
       propertyPath: buildManualPages.Array.data[76]
       value: 
       objectReference: {fileID: 2100000, guid: f37e0f9de3f98f14a830755361ad1019, type: 2}
+    - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
+        type: 3}
+      propertyPath: rightDirectionAction.actionPath
+      value: /actions/default/in/TrackPadRight
+      objectReference: {fileID: 0}
     - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
         type: 3}
       propertyPath: shrinkingPlayerHandlers.Array.size

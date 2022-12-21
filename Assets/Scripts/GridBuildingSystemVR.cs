@@ -95,6 +95,15 @@ public class GridBuildingSystemVR : MonoBehaviour
     [SerializeField] private float previewLineWidth = 0.001f;
 
 
+
+    public float controleCooldown;
+
+    private float lastControlUsage = default;
+
+
+
+
+
     private List<GridXZ<GridObject>> grids;
     private PlacedObjectTypeSO.Dir dir = PlacedObjectTypeSO.Dir.Down;
 
@@ -348,6 +357,8 @@ public class GridBuildingSystemVR : MonoBehaviour
 
         loadInstructionPages();
 
+        lastControlUsage = Time.time;
+
 
         bool showDebug = true;
         for (int i = 0; i < gridHeight; i++)
@@ -565,20 +576,25 @@ public class GridBuildingSystemVR : MonoBehaviour
         // Update Rotation
         UpdateRotation();
 
+
+        // Check if enough time passed since last control use
+        float pressedControlTime = Time.time;
+        if (pressedControlTime < lastControlUsage)
+            return;
+
         if(rightDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
         {
             // Advance manual page
             TurnManualPageForward();
+            lastControlUsage = pressedControlTime + controleCooldown;
         }
-
-        if(leftDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
+        else if(leftDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
         {
             // Go back 1 manual page
             TurnManualPageBackward();
+            lastControlUsage = pressedControlTime + controleCooldown;
         }
-
-
-       if(downDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
+        else if(downDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
         {
             // Check if player is shrunk
             if (playerShrunk)
@@ -593,6 +609,7 @@ public class GridBuildingSystemVR : MonoBehaviour
                 cleanupShrinkingPlayerHandlers();
                 paintBrush.revertPosition();
             }
+            lastControlUsage = pressedControlTime + controleCooldown;
         }
 
 
@@ -1482,7 +1499,7 @@ public class GridBuildingSystemVR : MonoBehaviour
                 longestBrickLength = spawnedPlacedObject.placedObjectTypeSO.width;
 
             // Advance Spawn position
-            if(numSpawned % 3 != 2) // 3 bricks in a column
+            if(numSpawned % 3 != 0) // 3 bricks in a column
             {
                 // Shift in x direction
                 spawnPosition += new Vector3(cellSize, 0, 0); // Space between bricks
