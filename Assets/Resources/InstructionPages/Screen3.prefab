@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3072907110899887425}
   - component: {fileID: 3588437074736058736}
   m_Layer: 0
-  m_Name: Screen2
+  m_Name: Screen3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,14 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 689e6d11a1e93d54381709693272b3c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenMaterial: {fileID: 2100000, guid: 78dd46de1a0f4ed439568a92b77cfcf7, type: 2}
+  screenMaterial: {fileID: 2100000, guid: 77c00cbf43667454099bc36a52f44e9a, type: 2}
   bricks:
   - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
   - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
   - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
-  - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
   brickMaterials:
-  - {fileID: 2100000, guid: 074c5a2c1d3de8c469709a65e1ac2905, type: 2}
   - {fileID: 2100000, guid: 074c5a2c1d3de8c469709a65e1ac2905, type: 2}
   - {fileID: 2100000, guid: 074c5a2c1d3de8c469709a65e1ac2905, type: 2}
   - {fileID: 2100000, guid: 074c5a2c1d3de8c469709a65e1ac2905, type: 2}
