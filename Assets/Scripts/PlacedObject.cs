@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,6 @@ public class PlacedObject : MonoBehaviour
 {
     public PlacedObjectTypeSO placedObjectTypeSO;
     public Throwable throwable;
-    //public ComplexThrowable complexThrowable;
     public Interactable interactable;
 
     private Vector3 worldPosition;
@@ -25,6 +25,10 @@ public class PlacedObject : MonoBehaviour
 
 
     public bool neverPickedUp = true;
+
+
+    public BrickLineRenderer attachedBrickLineRenderer;
+    public Ghost assignedGhost;
     
 
     [SerializeField] private List<Vector2Int> occupiedGridPositions = new List<Vector2Int>();
@@ -98,7 +102,7 @@ public class PlacedObject : MonoBehaviour
         // Connect Signals
         throwable.onPickUp.AddListener(this.onPickup);
         throwable.onPickUp.AddListener(delegate { GridBuildingSystemVR.Instance.pickupBrick(this);});
-        throwable.onDetachFromHand.AddListener(delegate { GridBuildingSystemVR.Instance.releaseBrick(); });
+        throwable.onDetachFromHand.AddListener(delegate { GridBuildingSystemVR.Instance.releaseBrick(this); });
 
         // Setup connection Hashes
         connectedToDownwards = new HashSet<PlacedObject>();
@@ -171,10 +175,37 @@ public class PlacedObject : MonoBehaviour
 
 
 
+
+
+
     private void LateUpdate()
     {
         if (!hasBaseSupport && !pickedUp && rigidbody.isKinematic && !neverPickedUp)
             makePhysicsEnabled();
+
+
+        if (!pickedUp)
+            return;
+
+        try
+        {
+            // Draw Lines
+            Vector3 hitPoint = getRaycastWithPlate();
+            attachedBrickLineRenderer.drawAnchorLines(hitPoint);
+            attachedBrickLineRenderer.Activate();
+
+            // Update Ghost
+            assignedGhost.UpdateGhost();
+            assignedGhost.Activate();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            attachedBrickLineRenderer.Deactivate();
+
+            // Deactivate Ghost
+            assignedGhost.Deactivate();
+        }
     }
 
 
@@ -182,6 +213,53 @@ public class PlacedObject : MonoBehaviour
 
 
 
+
+
+
+    /*
+     *  Returns the intersection point of a ray cast down from the brick towards the plate
+     *  
+     * 
+     *  THROWS EXCEPTION IF NO INTESECTION FOUND
+     */
+    public Vector3 getRaycastWithPlate()
+    {
+        // Get main anchor
+        GameObject anchor = GetAnchorForCurrentRotation();
+
+
+        // Setup LayerMask
+        RaycastHit hit;
+        LayerMask previewMask = LayerMask.GetMask("GridBuildingSystem", "Brick");
+
+
+        // Cast Ray to buildplate
+        Physics.queriesHitBackfaces = true;
+        if (anchor.transform.position.y < GridBuildingSystemVR.Instance.parentTransform.position.y)
+            Physics.Raycast(anchor.transform.position, Vector3.up, out hit, 999f, previewMask);
+        else
+            Physics.Raycast(anchor.transform.position, Vector3.down, out hit, 999f, previewMask);
+        Physics.queriesHitBackfaces = false;
+
+        Debug.DrawRay(anchor.transform.position, Vector3.down, Color.green);
+
+        if (!hit.collider)
+            throw new GridBuildingSystemVR.NoIntersectionException("No intersection with baseplate!");
+
+        return hit.point;
+    }
+
+
+
+
+
+
+
+
+
+    /*
+     *  Returns all positions the brick occupies within the grid
+     */
     public List<Vector2Int> GetGridPositionList()
     {
         return placedObjectTypeSO.GetGridPositionList(origin, dir);
@@ -229,19 +307,15 @@ public class PlacedObject : MonoBehaviour
             case 0:
                 //Debug.Log("DOWN");
                 return PlacedObjectTypeSO.Dir.Down;
-                break;
             case 1:
                 //Debug.Log("LEFT");
                 return PlacedObjectTypeSO.Dir.Left;
-                break;
             case 2:
                 //Debug.Log("UP");
                 return PlacedObjectTypeSO.Dir.Up;
-                break;
             case 3:
                 //Debug.Log("RIGHT");
                 return PlacedObjectTypeSO.Dir.Right;
-                break;
             default:
                 //Debug.Log("No Angle Found!");
                 break;

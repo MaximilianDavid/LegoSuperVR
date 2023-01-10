@@ -34,7 +34,7 @@ public class GridBuildingSystemVR : MonoBehaviour
     [SerializeField] private List<PlacedObjectTypeSO> placedObjectTypeSOVGhosts;
     [SerializeField] private Material deleteGhostMaterial;
     [SerializeField] public Material previewGhostMaterial;
-    [SerializeField] private Transform parentTransform;
+    [SerializeField] public Transform parentTransform;
     public GameObject leftHand;
     public GameObject rightHand;
     [SerializeField] private Transform leftControllerTransform;
@@ -56,7 +56,8 @@ public class GridBuildingSystemVR : MonoBehaviour
     private LineRenderer backLeftLineRenderer;
     private LineRenderer backRightLineRenderer;
 
-
+    private List<BrickLineRenderer> brickLineRenderers = new List<BrickLineRenderer>();
+    private List<Ghost> ghosts = new List<Ghost>();
 
     [SerializeField] private List<List<PlacedObject>> placedBricks = new List<List<PlacedObject>>();
 
@@ -115,37 +116,147 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
+
+
+
+
+
+
+
+
+    private void Awake()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+
+
+        // Setup grid system variables
+        Instance = this;
+
+        plateOrigin = transform.position;
+
+        this.scale = transform.localScale.x;
+        this.brickHeight = 9.6f * scale;
+        this.cellSize = 10 * scale;
+        this.brickOffset = 4.8f * scale;
+        this.basePlateHeight = .65f * scale * 2;
+        this.maximumSnapDistance = brickHeight * 1.5f;
+
+        plateCenter = new Vector3(
+            plateOrigin.x + (80 * scale),
+            plateOrigin.y,
+            plateOrigin.z + (80 * scale));
+
+
+        // Setup LineRenderers for Bricks
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject brickLineRendererObject = new GameObject("BrickLineRenderer" + i);
+            brickLineRenderers.Add(brickLineRendererObject.AddComponent<BrickLineRenderer>());
+        }
+        foreach (BrickLineRenderer brickLineRenderer in brickLineRenderers)
+        {
+            brickLineRenderer.setupRenderer(previewGhostMaterial, previewLineWidth);
+        }
+
+
+        // Setup Ghosts for Bricks
+        for(int i = 0; i < 2; i++)
+        {
+            GameObject ghost = new GameObject("Ghost" + i);
+            ghosts.Add(ghost.AddComponent<Ghost>());
+        }
+        foreach(Ghost ghost in ghosts)
+        {
+            // Setup ghost values
+            ghost.SetupGhost(previewGhostMaterial, new Vector3(scale, scale, scale));
+        }
+
+        
+
+        initialPlayerPosition = playerGameObject.transform.position;
+        initialPlayerRotation = playerGameObject.transform.rotation;
+
+
+        
+
+
+        grids = new List<GridXZ<GridObject>>();
+
+
+        loadInstructionPages();
+
+        lastControlUsage = Time.time;
+
+
+        bool showDebug = true;
+        for (int i = 0; i < gridHeight; i++)
+        {
+            // Add Lists for Bricks within each grid
+            placedBricks.Add(new List<PlacedObject>());
+
+
+            // Add Grids
+            grids.Add(
+                new GridXZ<GridObject>(
+                    gridWidth,
+                    gridLength,
+                    cellSize,
+                    parentTransform.position + new Vector3(0, basePlateHeight + i * brickOffset, 0),
+                    (GridXZ<GridObject> g, int x, int z) => new GridObject(g, x, z)));
+
+            if (i == 0 && showDebug)
+            {
+                grids[i].debugLineColor = Color.magenta;
+                grids[i].drawGridLines();
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /*
      *  Used to release a held Brick
      *  
      *  Snaps the brick to the grid, if it is currently near a valid grid position
      */
-    public void releaseBrick()
+    public void releaseBrick(PlacedObject placedObject)
     {
-        Transform brickTransform = currentlyHeldObject;
-        PlacedObject heldBrick = currentlyHeldPlacedObject;
-        GameObject heldVisualBrick = heldBrick.VisualBrick;
+        Transform brickTransform = placedObject.transform;
+        PlacedObject heldBrick = placedObject;
+
+
+        // Detach LBrickLineRenderers
+        placedObject.attachedBrickLineRenderer.Deactivate();
+        placedObject.attachedBrickLineRenderer.detachFromBrick();
+
+
+        // Unassign ghost
+        placedObject.assignedGhost.Deactivate();
+        placedObject.assignedGhost.UnassignFromBrick();
 
 
         // Turn on Collisions again
         heldBrick.ignoreCollisions(false);
 
-        // Reset currently held Object
-        currentlyHeldObject = null;
-        currentlyHeldPlacedObject = null;
-        placedObjectTypeSO = null;
-
-
-        ghost.Deactivate();
 
 
         SnapPoint snapPoint;
-
-
-        anchorLineRenderer.enabled = false;
-        frontLeftLineRenderer.enabled = false;
-        backLeftLineRenderer.enabled = false;
-        backRightLineRenderer.enabled = false;
 
 
         Vector3 absAngles = new Vector3(
@@ -163,42 +274,14 @@ public class GridBuildingSystemVR : MonoBehaviour
         {
             // Calculate the snap point for the held brick
             LayerMask mask = LayerMask.GetMask("GridBuildingSystem", "Brick");
-            //Physics.Raycast(heldBrick.transform.position, Vector3.down, out RaycastHit raycastHit, 99f, mask);
 
-            /*
-            if (!raycastHit.collider)
-                throw new CannotBuildHereException();
-            */
             Debug.Log("Calculating Snap Point!");
             snapPoint = GetSnapPoint(heldBrick);
             Debug.Log("Snap Point Calculated! " + snapPoint);
 
             int gridNumberForBuild = snapPoint.gridNumber;
-            //int gridNumberForBuild = GetGridNumber(new Vector3(snapPoint.x, snapPoint.y + brickHeight * 0.5f, snapPoint.z));
-            //grids[gridNumberForBuild].GetXZ(raycastHit.point, out int x, out int z);
-            //grids[gridNumberForBuild].GetXZ(snapPoint, out int x, out int z);
-
             Debug.Log("Grid number: " + gridNumberForBuild);
 
-            /*
-            if (absDifX > maximumAngleCorrection)
-            {
-                Debug.Log("Angle on X too far!");
-                throw new CannotBuildHereException();
-            }
-
-            if (absDifZ > maximumAngleCorrection)
-            {
-                Debug.Log("Angle on X too far!");
-                throw new CannotBuildHereException();
-            }
-
-            if (distanceToCollision > maximumSnapDistance)
-            {
-                Debug.Log("Collision too far away!");
-                throw new CannotBuildHereException();
-            }
-            */
 
             if (gridNumberForBuild >= 0)
             {
@@ -281,15 +364,38 @@ public class GridBuildingSystemVR : MonoBehaviour
         placedObject.makeKinematic();
         placedObject.pickUp();
 
-        
-        // Set brick as currently held object
-        currentlyHeldPlacedObject = placedObject;
-        currentlyHeldObject = placedObject.transform;
-        placedObjectTypeSO = placedObject.placedObjectTypeSO;
-        placedObject.ignoreCollisions();
-        //MyUtilities.MyUtils.SetLayerRecursively(currentlyHeldPlacedObject.gameObject, 0);
 
-        RefreshSelectedObjectType();
+
+
+        // Attach free line renderer to brick
+        if (!placedObject.attachedBrickLineRenderer)
+            foreach (BrickLineRenderer brickLineRenderer in brickLineRenderers)
+            {
+                if (!brickLineRenderer.attachedToBrick())
+                {
+                    brickLineRenderer.attachToBrick(placedObject);
+                    //Debug.LogWarning("Attached BrickLineRenderer " + brickLineRenderer);
+                    break;
+                }
+            }
+        
+
+        // Assign free ghost to brick
+        if(!placedObject.assignedGhost)
+            foreach (Ghost ghost in ghosts)
+            {
+                if(!ghost.IsAssignedToBrick())
+                {
+                    ghost.AssignToBrick(placedObject);
+                    break;
+                }
+            }
+
+        // Update ghosts Visual
+        placedObject.assignedGhost.RefreshVisual();
+
+        placedObject.ignoreCollisions();
+
 
         if (placedObject.HasBaseSupport())
         {
@@ -308,7 +414,7 @@ public class GridBuildingSystemVR : MonoBehaviour
         }
 
 
-        currentlyHeldPlacedObject.OccupiedGridPositions.Clear();
+        placedObject.OccupiedGridPositions.Clear();
         
     }
 
@@ -326,102 +432,7 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
-    private void Awake()
-    {
-        lineRenderer = GetComponent<LineRenderer>();
-
-        Instance = this;
-
-        plateOrigin = transform.position;
-
-        this.scale = transform.localScale.x;
-        this.brickHeight = 9.6f * scale;
-        this.cellSize = 10 * scale;
-        this.brickOffset = 4.8f * scale;
-        this.basePlateHeight = .65f * scale * 2;
-        this.maximumSnapDistance = brickHeight * 1.5f;
-
-
-        initialPlayerPosition = playerGameObject.transform.position;
-        initialPlayerRotation = playerGameObject.transform.rotation;
-
-
-        plateCenter = new Vector3(
-            plateOrigin.x + (80 * scale),
-            plateOrigin.y,
-            plateOrigin.z + (80 * scale));
-
-
-        grids = new List<GridXZ<GridObject>>();
-
-
-        loadInstructionPages();
-
-        lastControlUsage = Time.time;
-
-
-        bool showDebug = true;
-        for (int i = 0; i < gridHeight; i++)
-        {
-            // Add Lists for Bricks within each grid
-            placedBricks.Add(new List<PlacedObject>());
-
-
-            // Add Grids
-            grids.Add(
-                new GridXZ<GridObject>(
-                    gridWidth, 
-                    gridLength, 
-                    cellSize, 
-                    parentTransform.position + new Vector3(0, basePlateHeight + i * brickOffset, 0), 
-                    (GridXZ<GridObject> g, int x, int z) => new GridObject(g, x, z)));
-
-            if (i == 0 && showDebug)
-            {
-                grids[i].debugLineColor = Color.magenta;
-                grids[i].drawGridLines();
-            }
-        }
-
-
-        placedObjectTypeSO = placedObjectTypeSOList[0];
-
-        // Initialize line renderers
-        GameObject anchorRendererObject = new GameObject("anchorRendererObject");
-        anchorLineRenderer = anchorRendererObject.AddComponent<LineRenderer>();
-        anchorLineRenderer.startWidth = previewLineWidth;
-        anchorLineRenderer.endWidth = previewLineWidth;
-        anchorLineRenderer.material = previewGhostMaterial;
-
-        GameObject frontLeftAnchorRendererObject = new GameObject("frontLeftAnchorRendererObject");
-        frontLeftLineRenderer = frontLeftAnchorRendererObject.AddComponent<LineRenderer>();
-        frontLeftLineRenderer.startWidth = previewLineWidth;
-        frontLeftLineRenderer.endWidth = previewLineWidth;
-        frontLeftLineRenderer.material = previewGhostMaterial;
-
-        GameObject backLeftAnchorRendererObject = new GameObject("backLeftAnchorRendererObject");
-        backLeftLineRenderer = backLeftAnchorRendererObject.AddComponent<LineRenderer>();
-        backLeftLineRenderer.startWidth = previewLineWidth;
-        backLeftLineRenderer.endWidth = previewLineWidth;
-        backLeftLineRenderer.material = previewGhostMaterial;
-
-        GameObject backRightAnchorRendererObject = new GameObject("backRightAnchorRendererObject");
-        backRightLineRenderer = backRightAnchorRendererObject.AddComponent<LineRenderer>();
-        backRightLineRenderer.startWidth = previewLineWidth;
-        backRightLineRenderer.endWidth = previewLineWidth;
-        backRightLineRenderer.material = previewGhostMaterial;
-
-
-        anchorLineRenderer.enabled = false;
-        frontLeftLineRenderer.enabled = false;
-        backLeftLineRenderer.enabled = false;
-        backRightLineRenderer.enabled = false;
-
-
-        RefreshSelectedObjectType();
-        ghost.Deactivate();
-    }
-
+    
 
 
 
@@ -440,128 +451,7 @@ public class GridBuildingSystemVR : MonoBehaviour
 
     private void LateUpdate()
     {
-        if(currentlyHeldPlacedObject != null)
-        {
-
-            // Get all corners of held brick
-            //GameObject anchor = currentlyHeldPlacedObject.Anchor;
-            GameObject anchor = currentlyHeldPlacedObject.GetAnchorForCurrentRotation();
-            GameObject mainAnchor = currentlyHeldPlacedObject.Anchor;
-            GameObject frontLeftAnchor = currentlyHeldPlacedObject.FrontLeftAnchor;
-            GameObject backLeftAnchor = currentlyHeldPlacedObject.BackLeftAnchor;
-            GameObject backRightAnchor = currentlyHeldPlacedObject.BackRightAnchor;
-
-
-            // Get the angles of the held brick
-            Vector3 absAngles = new Vector3(
-                Mathf.Abs(currentlyHeldObject.eulerAngles.x),
-                Mathf.Abs(currentlyHeldObject.eulerAngles.y),
-                Mathf.Abs(currentlyHeldObject.eulerAngles.z));
-
-            // Calculate angle offsets
-            float absDifX = Mathf.Abs(Mathf.DeltaAngle(currentlyHeldObject.eulerAngles.x, 0));
-            float absDifZ = Mathf.Abs(Mathf.DeltaAngle(currentlyHeldObject.eulerAngles.z, 0));
-            float distanceToCollision = 0f;
-
-
-            // Calculate estimated placement for currently held brick
-            RaycastHit hit;
-            LayerMask previewMask = LayerMask.GetMask("GridBuildingSystem", "Brick");
-            Vector3 floorNormal = new Vector3(currentlyHeldObject.position.x, 0, currentlyHeldObject.position.z).normalized;
-
-            Physics.queriesHitBackfaces = true;
-            if(anchor.transform.position.y < this.parentTransform.position.y)
-                Physics.Raycast(anchor.transform.position, Vector3.up, out hit, 999f, previewMask);
-            else
-                Physics.Raycast(anchor.transform.position, Vector3.down, out hit, 999f, previewMask);
-            Physics.queriesHitBackfaces = false;
-
-            if (hit.collider)
-            {
-                /*
-                // Get Gridnumbers
-                int hitGridNumber = GetGridNumber(hit.point);
-                int heldGridNumber = GetGridNumber(new Vector3(anchor.transform.position.x, anchor.transform.position.y + brickHeight*0.5f, anchor.transform.position.z));
-                //grids[heldGridNumber].GetXZ(anchor.transform.position, out int heldX, out int heldZ);
-                Vector3 snapPoint = GetSnapPoint(currentlyHeldPlacedObject);
-                int heldX = (int)snapPoint.x;
-                int heldZ = (int)snapPoint.z;
-                currentlyHeldPlacedObject.SetOrigin(new Vector2Int(heldX, heldZ));
-                currentlyHeldPlacedObject.SetDir(currentlyHeldPlacedObject.GetClosestDir());
-
-                // Get highest brick between currently held location and RayCastHit
-                PlacedObject highestBrick = CalculateHighestBrickBetween(
-                    hitGridNumber, 
-                    heldGridNumber,
-                    currentlyHeldPlacedObject.GetGridPositionList());
-
-                // Set collision distance to correct value
-                if (highestBrick != null)
-                {
-                    //Vector3 relHeldPosition = new Vector3(0, currentlyHeldObject.position.y, 0);
-                    Vector3 relHeldPosition = new Vector3(0, anchor.transform.position.y, 0);
-                    Vector3 relBrickPosition = new Vector3(0, highestBrick.transform.position.y + brickHeight, 0);
-                    distanceToCollision = Mathf.Abs(Vector3.Distance(relHeldPosition, relBrickPosition));
-                }
-                else
-                {
-                    //distanceToCollision = Mathf.Abs(Vector3.Distance(hit.point, currentlyHeldObject.position));
-                    distanceToCollision = Mathf.Abs(Vector3.Distance(hit.point, anchor.transform.position));
-                }
-                */
-
-                // Display Guide Lines
-                anchorLineRenderer.enabled = true;
-                frontLeftLineRenderer.enabled = true;
-                backLeftLineRenderer.enabled = true;
-                backRightLineRenderer.enabled = true;
-
-                anchorLineRenderer.SetPosition(0, mainAnchor.transform.position);
-                anchorLineRenderer.SetPosition(1, new Vector3(mainAnchor.transform.position.x, hit.point.y, mainAnchor.transform.position.z));
-
-                frontLeftLineRenderer.SetPosition(0, frontLeftAnchor.transform.position);
-                frontLeftLineRenderer.SetPosition(1, new Vector3(frontLeftAnchor.transform.position.x, hit.point.y, frontLeftAnchor.transform.position.z));
-
-                backLeftLineRenderer.SetPosition(0, backLeftAnchor.transform.position);
-                backLeftLineRenderer.SetPosition(1, new Vector3(backLeftAnchor.transform.position.x, hit.point.y, backLeftAnchor.transform.position.z));
-
-                backRightLineRenderer.SetPosition(0, backRightAnchor.transform.position);
-                backRightLineRenderer.SetPosition(1, new Vector3(backRightAnchor.transform.position.x, hit.point.y, backRightAnchor.transform.position.z));
-            }
-            else
-            {
-                distanceToCollision = float.MaxValue;
-
-
-                anchorLineRenderer.enabled = false;
-                frontLeftLineRenderer.enabled = false;
-                backLeftLineRenderer.enabled = false;
-                backRightLineRenderer.enabled = false;
-            }
-
-
-
-            if (distanceToCollision <= maximumSnapDistance && !ghost.IsActive())
-            {
-                // Display ghost
-                ghost.Activate();
-
-
-            }
-            if(distanceToCollision > maximumSnapDistance && ghost.IsActive())
-            {
-                ghost.Deactivate();
-                Debug.Log("Deactivating ghost due to high distance");
-            }
-
-
-
-        }
-        else
-        {
-            if (ghost.IsActive())
-                ghost.Deactivate();
-        }
+        
     }
 
 
@@ -573,7 +463,7 @@ public class GridBuildingSystemVR : MonoBehaviour
 
     private void Update()
     {
-        // Update Rotation
+        // Update Plate Rotation
         UpdateRotation();
 
 

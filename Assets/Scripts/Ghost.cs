@@ -9,71 +9,78 @@ using System;
 public class Ghost : MonoBehaviour
 {
 
-    [SerializeField] GridBuildingSystemVR grid; // Corresponding grid system
+    //[SerializeField] GridBuildingSystemVR grid; // Corresponding grid system
     [SerializeField] Material ghostMaterial;
 
     private Transform visual;   
-    private PlacedObjectTypeSO placedObjectTypeSO;
+    private PlacedObjectTypeSO brickType;
 
+    private PlacedObject assignedBrick;
 
+    public Vector3 scale = Vector3.one;
 
 
     private void Start()
     {
-        RefreshVisual();
 
-        if(visual != null)
-            visual.gameObject.SetActive(false);
-
-        GridBuildingSystemVR.Instance.OnSelectedBrickChanged += Instance_OnSelectedChanged;
     }
 
 
 
 
-    private void Instance_OnSelectedChanged(object sender, System.EventArgs e)
+    /*
+     *  Sets all necessary values for the ghost
+     */
+    public void SetupGhost(Material ghostMaterial, Vector3 scale)
     {
+        this.ghostMaterial = ghostMaterial;
+        this.scale = scale;
+
         RefreshVisual();
     }
+
+
 
 
 
 
     private void LateUpdate()
     {
+    }
+
+
+
+
+    /*
+     *  Updates the ghost's Position, Rotation, Visibility
+     */
+    public void UpdateGhost()
+    {
+        if (!assignedBrick)
+            return;
         try
         {
-            if (grid.GetCurrentlyHeldPlacedObject() == null)
-            {
-                return;
-            }
-            if (!grid.GetCurrentlyHeldPlacedObject().isPickedUp())
-            {
-                return;
-            }
-
-
             // Get the position and rotation to display the preview
-            SnapPoint snapPoint = GridBuildingSystemVR.Instance.GetSnapPoint(GridBuildingSystemVR.Instance.GetCurrentlyHeldPlacedObject());
+            SnapPoint snapPoint = GridBuildingSystemVR.Instance.GetSnapPoint(assignedBrick);
             Vector3 targetPosition = snapPoint.worldLocation;
 
             if (visual == null)
                 RefreshVisual();
 
             transform.position = targetPosition;
-            //Debug.Log("Ghost Position: " + targetPosition);
-            transform.rotation = GridBuildingSystemVR.Instance.GetPlacedObjectRotation();
+            transform.rotation = GridBuildingSystemVR.Instance.GetPlacedObjectRotation(assignedBrick);
 
             // Rotate ghost around plate center
             transform.RotateAround(
-                GridBuildingSystemVR.Instance.plateCenter, 
-                new Vector3(0, 1, 0), 
+                GridBuildingSystemVR.Instance.plateCenter,
+                new Vector3(0, 1, 0),
                 -GridBuildingSystemVR.Instance.currentGlobalRotation);
 
-            
+
         }
         catch (Exception e)
         {
+            Debug.LogError(e.Message);
             if (visual != null)
             {
                 Destroy(visual.gameObject);
@@ -83,11 +90,13 @@ public class Ghost : MonoBehaviour
     }
 
 
+
+
     
     /*
      *  Reloads the visual for the preview, based on the currently held brick type
      */
-    private void RefreshVisual()
+    public void RefreshVisual()
     {
         if(visual != null)
         {
@@ -95,17 +104,73 @@ public class Ghost : MonoBehaviour
             visual = null;
         }
 
-        PlacedObjectTypeSO placedObjectTypeSO = GridBuildingSystemVR.Instance.GetCurrentGhosttPlacedObjectTypeSO();
+        if (!assignedBrick)
+            return;
 
-        if(placedObjectTypeSO != null)
+        //PlacedObjectTypeSO placedObjectTypeSO = GridBuildingSystemVR.Instance.GetCurrentGhosttPlacedObjectTypeSO();
+
+
+        if (brickType != null)
         {
-            visual = Instantiate(placedObjectTypeSO.ghostVisual, Vector3.zero, Quaternion.identity);
-            visual.localScale = grid.transform.localScale;
+            visual = Instantiate(brickType.ghostVisual, Vector3.zero, Quaternion.identity);
+            visual.localScale = scale;
             visual.parent = transform;
             visual.localPosition = Vector3.zero;
             visual.localEulerAngles = Vector3.zero;
             SetLayerRecursive(visual.gameObject, 0);
         }
+    }
+
+
+
+
+
+
+
+    /*
+     *  Assigns the ghost to  the given brick
+     */
+    public void AssignToBrick(PlacedObject brick)
+    {
+        // Unsassign brick if already assigned
+        if(assignedBrick)
+        {
+            UnassignFromBrick();
+        }
+
+        assignedBrick = brick;
+        brickType = brick.placedObjectTypeSO;
+
+        brick.assignedGhost = this;
+    }
+
+
+
+
+
+
+    /*
+     *  Removes the ghost from its current brick
+     */
+    public void UnassignFromBrick()
+    {
+        if (!assignedBrick)
+            return;
+
+        assignedBrick.assignedGhost = null;
+        assignedBrick = null;
+        brickType = null;
+    }
+
+
+
+
+    /*
+     *  Returns wether the ghost is currently assigned to a brick
+     */
+    public bool IsAssignedToBrick()
+    {
+        return assignedBrick;
     }
 
 
