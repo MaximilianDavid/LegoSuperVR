@@ -147,6 +147,15 @@ public class GridBuildingSystemVR : MonoBehaviour
             plateOrigin.z + (80 * scale));
 
 
+        grids = new List<GridXZ<GridObject>>();
+
+
+        initialPlayerPosition = playerGameObject.transform.position;
+        initialPlayerRotation = playerGameObject.transform.rotation;
+
+
+        lastControlUsage = Time.time;
+
         // Setup LineRenderers for Bricks
         for (int i = 0; i < 2; i++)
         {
@@ -171,21 +180,17 @@ public class GridBuildingSystemVR : MonoBehaviour
             ghost.SetupGhost(previewGhostMaterial, new Vector3(scale, scale, scale));
         }
 
-        
-
-        initialPlayerPosition = playerGameObject.transform.position;
-        initialPlayerRotation = playerGameObject.transform.rotation;
+   
 
 
         
 
 
-        grids = new List<GridXZ<GridObject>>();
 
 
         loadInstructionPages();
 
-        lastControlUsage = Time.time;
+
 
 
         bool showDebug = true;
