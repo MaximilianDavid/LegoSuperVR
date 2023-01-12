@@ -1393,15 +1393,15 @@ public class GridBuildingSystemVR : MonoBehaviour
             addToBrickList(spawnedPlacedObject);
 
             // Check if new brick is longer than longest brick yet
-            if (longestBrickLength < spawnedPlacedObject.placedObjectTypeSO.width)
-                longestBrickLength = spawnedPlacedObject.placedObjectTypeSO.width;
+            if (longestBrickLength < spawnedPlacedObject.placedObjectTypeSO.height)
+                longestBrickLength = spawnedPlacedObject.placedObjectTypeSO.height;
 
             // Advance Spawn position
             if(numSpawned % 3 != 0) // 3 bricks in a column
             {
                 // Shift in x direction
                 spawnPosition += new Vector3(cellSize, 0, 0); // Space between bricks
-                spawnPosition += new Vector3(cellSize * spawnedPlacedObject.placedObjectTypeSO.height, 0, 0);
+                spawnPosition += new Vector3(cellSize * spawnedPlacedObject.placedObjectTypeSO.width, 0, 0);
             }
             else
             {
