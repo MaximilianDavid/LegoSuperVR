@@ -46,12 +46,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   screenMaterial: {fileID: 2100000, guid: 8d7833a9f8679ae4584bca63b24713f6, type: 2}
   bricks:
+  - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
+  - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
+  - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
   - {fileID: 2381780677131166347, guid: 633fd72577ab1e4459a1269ca1dfecb8, type: 3}
-  - {fileID: 2381780677131166347, guid: 633fd72577ab1e4459a1269ca1dfecb8, type: 3}
-  - {fileID: 2381780677131166347, guid: 633fd72577ab1e4459a1269ca1dfecb8, type: 3}
-  - {fileID: 2381780677131166347, guid: 633fd72577ab1e4459a1269ca1dfecb8, type: 3}
+  - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
   brickMaterials:
   - {fileID: 2100000, guid: 1ea89f90d6bfe4343a4002a8cb03e9bc, type: 2}
   - {fileID: 2100000, guid: 7000cd2f1bed4ff4cb163712864e7093, type: 2}
   - {fileID: 2100000, guid: 1db2c769e432e314a8651f8ecb26c0c8, type: 2}
   - {fileID: 2100000, guid: 5bb4afe7d01355a4698a73b25910e189, type: 2}
+  - {fileID: 2100000, guid: b72aeecad6a89c94f831b04113173897, type: 2}
