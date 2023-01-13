@@ -1250,8 +1250,11 @@ public class GridBuildingSystemVR : MonoBehaviour
      */
     private void loadInstructionPages()
     {
-        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/ControlScreen1"));
-        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/ControlScreen2"));
+        for(int i = 1; i <= 7; i++)
+        {
+            buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/ControlScreen " + i));
+        }
+        
         for(int i = 1; i <= 22; i++)
         {
             buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen" + i));
