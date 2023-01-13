@@ -102,6 +102,7 @@ public class PlacedObject : MonoBehaviour
         // Connect Signals
         throwable.onPickUp.AddListener(this.onPickup);
         throwable.onPickUp.AddListener(delegate { GridBuildingSystemVR.Instance.pickupBrick(this);});
+        throwable.onDetachFromHand.AddListener(this.onDropped);
         throwable.onDetachFromHand.AddListener(delegate { GridBuildingSystemVR.Instance.releaseBrick(this); });
 
         // Setup connection Hashes
@@ -145,6 +146,12 @@ public class PlacedObject : MonoBehaviour
 
 
 
+    public void onDropped()
+    {
+        // Parent Brick to Bricks GameObject
+        transform.parent = GridBuildingSystemVR.Instance.brickParent.transform;
+    }
+
 
 
     /*
@@ -171,6 +178,9 @@ public class PlacedObject : MonoBehaviour
 
         // Register clone in Brick list
         GridBuildingSystemVR.Instance.addToBrickList(instance.GetComponent<PlacedObject>());
+
+        // Parent instantiated Brick to Bricks GameObject
+        instance.transform.parent = GridBuildingSystemVR.Instance.brickParent.transform;
     }
 
 

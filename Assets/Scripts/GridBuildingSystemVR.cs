@@ -20,6 +20,7 @@ public class GridBuildingSystemVR : MonoBehaviour
     public SteamVR_Action_Boolean downDirectionAction;
 
     public GameObject playerGameObject;
+    [HideInInspector] public GameObject brickParent;
     [HideInInspector] public bool playerShrunk = false;
     private Vector3 initialPlayerPosition;
     private Quaternion initialPlayerRotation;
@@ -127,7 +128,7 @@ public class GridBuildingSystemVR : MonoBehaviour
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
-
+        brickParent = GameObject.Find("Bricks");
 
         // Setup grid system variables
         Instance = this;
@@ -1249,11 +1250,12 @@ public class GridBuildingSystemVR : MonoBehaviour
      */
     private void loadInstructionPages()
     {
-        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen0"));
-        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen1"));
-        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen2"));
-        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen3"));
-        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen4"));
+        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/ControlScreen1"));
+        buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/ControlScreen2"));
+        for(int i = 1; i <= 22; i++)
+        {
+            buildManualPages.Add(Resources.Load<InstructionPage>("InstructionPages/Screen" + i));
+        }
     }
 
 
@@ -1391,6 +1393,10 @@ public class GridBuildingSystemVR : MonoBehaviour
 
             // Register brick within system
             addToBrickList(spawnedPlacedObject);
+
+
+            // Parent instantiated brick to Bricks GameObject
+            spawnedBrick.transform.parent = brickParent.transform;
 
             // Check if new brick is longer than longest brick yet
             if (longestBrickLength < spawnedPlacedObject.placedObjectTypeSO.height)

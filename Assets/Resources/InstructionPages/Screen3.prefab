@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 689e6d11a1e93d54381709693272b3c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenMaterial: {fileID: 2100000, guid: 77c00cbf43667454099bc36a52f44e9a, type: 2}
+  screenMaterial: {fileID: 2100000, guid: 6ad0a89a91d997b40b15777f07cbc8a0, type: 2}
   bricks:
   - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
   - {fileID: 2381780677131166347, guid: e483e495460d2e2429ab74168990fde5, type: 3}
