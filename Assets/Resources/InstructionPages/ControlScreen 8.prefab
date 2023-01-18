@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3072907110899887425}
   - component: {fileID: 3588437074736058736}
   m_Layer: 0
-  m_Name: ControlScreen 6
+  m_Name: ControlScreen 8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 689e6d11a1e93d54381709693272b3c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenMaterial: {fileID: 2100000, guid: e0d13ef8e5cdb4346948cc31a96b78d7, type: 2}
+  screenMaterial: {fileID: 2100000, guid: b5dafcbc6aa2ed64f88d43bce4f851e5, type: 2}
   bricks: []
   brickMaterials: []
