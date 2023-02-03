@@ -49,7 +49,11 @@ MonoBehaviour:
   - {fileID: 2381780677131166347, guid: a3a12c7abe7d65141bd5ee2c87fc2946, type: 3}
   - {fileID: 2381780677131166347, guid: a3a12c7abe7d65141bd5ee2c87fc2946, type: 3}
   - {fileID: 2381780677131166347, guid: 3bbd82d0571250e4689ead7b0c9bc9fb, type: 3}
+  - {fileID: 2381780677131166347, guid: c01d8109987e7d743b982f2bdf0815fb, type: 3}
+  - {fileID: 2381780677131166347, guid: c01d8109987e7d743b982f2bdf0815fb, type: 3}
   brickMaterials:
   - {fileID: 2100000, guid: a4a1c7c947566bb4197e80eb67cb0869, type: 2}
   - {fileID: 2100000, guid: 0939bb8856d27e644b864f2c0807fd31, type: 2}
   - {fileID: 2100000, guid: 7000cd2f1bed4ff4cb163712864e7093, type: 2}
+  - {fileID: 2100000, guid: 1db2c769e432e314a8651f8ecb26c0c8, type: 2}
+  - {fileID: 2100000, guid: 1db2c769e432e314a8651f8ecb26c0c8, type: 2}
