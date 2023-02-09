@@ -48,7 +48,7 @@ public class PlacedObject : MonoBehaviour
 
     private Rigidbody rigidbody;
 
-
+    public Material material;
     
     private GameObject anchor;
     private GameObject frontLeftAnchor;
@@ -98,6 +98,7 @@ public class PlacedObject : MonoBehaviour
         interactable = GetComponent<Interactable>();
         if (!meshRenderer)
             meshRenderer = gameObject.GetComponentInChildren<MeshRenderer>();
+        material = meshRenderer.material;
 
         // Connect Signals
         throwable.onPickUp.AddListener(this.onPickup);
@@ -388,6 +389,7 @@ public class PlacedObject : MonoBehaviour
             meshRenderer = gameObject.GetComponentInChildren<MeshRenderer>();
 
         meshRenderer.material = material;
+        this.material = material;
     }
 
 

@@ -6081,6 +6081,11 @@ PrefabInstance:
       objectReference: {fileID: 720183331}
     - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
         type: 3}
+      propertyPath: ParticipantNumber
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 3247183866375909154, guid: 8e1ca6a5b5ee68347ad744e5713cef81,
+        type: 3}
       propertyPath: bricks.Array.size
       value: 6
       objectReference: {fileID: 0}

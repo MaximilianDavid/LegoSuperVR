@@ -4,6 +4,7 @@ using System;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using System.IO;
 
 
 /*
@@ -62,6 +63,9 @@ public class GridBuildingSystemVR : MonoBehaviour
 
     [SerializeField] private List<List<PlacedObject>> placedBricks = new List<List<PlacedObject>>();
 
+    public List<PlacedObjectTypeSO> brickTypes = new List<PlacedObjectTypeSO>();
+    public List<Material> brickMaterials = new List<Material>();
+
 
     private PlacedObjectTypeSO placedObjectTypeSO = null;
 
@@ -98,10 +102,13 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
-    public float controleCooldown;
+    public float controlCooldown;
+
+
+    public int ParticipantNumber;
+
 
     private float lastControlUsage = default;
-
 
 
 
@@ -181,11 +188,12 @@ public class GridBuildingSystemVR : MonoBehaviour
             ghost.SetupGhost(previewGhostMaterial, new Vector3(scale, scale, scale));
         }
 
-   
 
 
-        
 
+
+        LoadBrickTypesFromResources();
+        LoadBrickMaterialsFromResources();
 
 
 
@@ -473,6 +481,11 @@ public class GridBuildingSystemVR : MonoBehaviour
         UpdateRotation();
 
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ExportBricksAsCSV();
+        }
+
         // Check if enough time passed since last control use
         float pressedControlTime = Time.time;
         if (pressedControlTime < lastControlUsage)
@@ -482,13 +495,13 @@ public class GridBuildingSystemVR : MonoBehaviour
         {
             // Advance manual page
             TurnManualPageForward();
-            lastControlUsage = pressedControlTime + controleCooldown;
+            lastControlUsage = pressedControlTime + controlCooldown;
         }
         else if(leftDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
         {
             // Go back 1 manual page
             TurnManualPageBackward();
-            lastControlUsage = pressedControlTime + controleCooldown;
+            lastControlUsage = pressedControlTime + controlCooldown;
         }
         else if(downDirectionAction.GetStateDown(SteamVR_Input_Sources.Any))
         {
@@ -505,11 +518,13 @@ public class GridBuildingSystemVR : MonoBehaviour
                 cleanupShrinkingPlayerHandlers();
                 paintBrush.revertPosition();
             }
-            lastControlUsage = pressedControlTime + controleCooldown;
+            lastControlUsage = pressedControlTime + controlCooldown;
         }
 
 
+
        
+
     }
 
 
@@ -1241,8 +1256,25 @@ public class GridBuildingSystemVR : MonoBehaviour
 
 
 
+    /*
+    *  Loads all brick types from Resources folder into brickTypes list
+    */
+    private void LoadBrickTypesFromResources()
+    {
+        brickTypes.AddRange(Resources.LoadAll<PlacedObjectTypeSO>("BrickTypes/"));
+    }
 
-    
+
+
+
+    /*
+     *  Loads all brick materials from Resources folder into the brickMaterials list
+     */
+    private void LoadBrickMaterialsFromResources()
+    {
+        brickMaterials.AddRange(Resources.LoadAll<Material>("BrickMaterials/"));
+    }
+
 
 
     /*
@@ -1460,6 +1492,145 @@ public class GridBuildingSystemVR : MonoBehaviour
     {
         playerShrunk = shrunk;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
+     *  Scans and counts all placed down bricks and exports them as a csv
+     */
+    public void ExportBricksAsCSV()
+    {
+        // Create Hash for counting bricks
+        Dictionary<string, int> brickCounts = new Dictionary<string, int>();
+
+
+        // Populate Hash with default values
+        /*
+         * for every brick type
+         *  for every material
+         *      add brick type + material = 0
+         */
+        foreach (PlacedObjectTypeSO brickType in brickTypes)
+        {
+            string brickName = convertToBrickNameString(brickType);
+
+            foreach (Material brickMaterial in brickMaterials)
+            {
+                string fullBrickName = brickName + brickMaterial.name;  // Brick type + color
+                brickCounts.Add(fullBrickName, 0); // Add to hash
+            }
+        }
+
+
+
+        // Iterate through placed bricks and increment corresponding value in dictionary
+        foreach (List<PlacedObject> layer in placedBricks)
+        {
+            foreach (PlacedObject brick in layer)
+            {
+                string brickName = convertToBrickNameString(brick.placedObjectTypeSO);
+                brickName += brick.material.name.Replace(" (Instance)", "");
+                brickCounts[brickName] = brickCounts[brickName] + 1;
+            }
+        }
+
+
+        SaveBrickCountDictionaryAsCSV(brickCounts);
+
+        foreach (String key in brickCounts.Keys)
+            Debug.Log(key + ": " + brickCounts[key]);
+    }
+
+
+
+
+
+
+
+    /*
+     *  Returns the brick type of the given PlacedObjectTypeSO as a string
+     *  (e.g.: 1x1 or 1x1 Round)
+     */
+    private String convertToBrickNameString(PlacedObjectTypeSO placedObjectTypeSO)
+    {
+        if (placedObjectTypeSO.name.Contains("1x1Lego"))
+            return "1x1 ";
+        else if (placedObjectTypeSO.name.Contains("1x1Round"))
+            return "Round 1x1 ";
+        else if (placedObjectTypeSO.name.Contains("1x2"))
+            return "1x2 ";
+        else if (placedObjectTypeSO.name.Contains("2x2"))
+            return "2x2 ";
+        else if (placedObjectTypeSO.name.Contains("1x4"))
+            return "1x4 ";
+        else if (placedObjectTypeSO.name.Contains("2x4"))
+            return "2x4 ";
+        else
+        {
+            Debug.LogError("Illegal Brick Type!!!");
+            return "";
+        }
+    }
+
+
+
+
+
+
+
+
+
+    /*
+     *  Takes the given BrickCount Dictionary and saves it to "VRCloneBricksParticipant<ParticipantNumber>.csv"
+     *  
+     *  <ParticipantNumber> needs to be set in the inspector
+     */
+    public void SaveBrickCountDictionaryAsCSV(Dictionary<string, int> brickCounts)
+    {
+        string headers;
+        string values;
+
+        // Setup array with brick types
+        List<string> keys = new List<string>(brickCounts.Keys);
+
+
+        // Assemble csv strings
+        headers = "\"" + keys[0] + "\",";
+        values = "\"" + brickCounts[keys[0]] + "\",";
+
+        for (int i = 1; i < keys.Count - 1; i++)
+        {
+            headers += "\"" + keys[i] + "\",";
+            values += "\"" + brickCounts[keys[i]] + "\",";
+        }
+
+        headers += "\"" + keys[keys.Count - 1] + "\"";
+        values += "\"" + brickCounts[keys[keys.Count - 1]] + "\"";
+
+
+
+        // Check if file already exists
+        if (File.Exists("FeaturedVRBricksParticipant" + ParticipantNumber + ".csv"))
+            File.WriteAllText("FeaturedVRBricksParticipant" + (ParticipantNumber + 1) + ".csv", headers + "\n" + values);
+        else
+            File.WriteAllText("FeaturedVRBricksParticipant" + ParticipantNumber + ".csv", headers + "\n" + values);
+
+        Debug.Log("BrickCounts successfully exported!");
+    }
+
+
 
 
 
