@@ -1,5 +1,5 @@
 # VRLegoSuperpowers
-The Lego Building variant with Superpowers
+The Lego Building variant with additional features.
 
 ## Instructions
 1. Install Steam VR and connect a compatible VR device to the PC
