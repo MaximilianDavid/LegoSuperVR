@@ -1,4 +1,4 @@
-# VRLegoSuperpowers
+# LEGO SUPER VR
 The Lego Building variant with additional features.
 
 ## Instructions for usage
